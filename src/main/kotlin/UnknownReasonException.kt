@@ -1,0 +1,1 @@
+class UnknownReasonException : RuntimeException()
