@@ -14,44 +14,37 @@ class WallServiceTest {
     fun updateExists() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
         val exists = WallService.update(post.copy(text = "another text"))
-        assert(exists)
+        assertTrue(exists)
     }
 
     @Test
     fun updateNotExists() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
         val exists = WallService.update(post.copy(text = "another text", id = post.id + 1))
-        assert(!exists)
+        assertFalse(exists)
     }
 
     @Test
     fun commentShouldNotThrow() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
-        val postId = post.id
-        val comment = Comment(postId, 0, "some thread", 0, null)
-        val returnComment = WallService.createComment(postId, comment)
-        assertEquals(
-            comment,
-            returnComment
-        )
+        val comment = Comment(0, post.id,0, "some thread", 0, null)
+        val returnComment = WallService.createComment(post.id, comment)
+        assertEquals(comment, returnComment)
     }
 
     @Test(expected = PostNotFoundException::class)
     fun commentShouldThrow() {
-        WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
-        val comment = Comment(0, 0, "some thread", 0, null)
-        WallService.createComment(
-            6,
-            comment
-        )
+        val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
+        val falsePostId = post.id + 1
+        val comment = Comment(0, falsePostId,0, "some thread", 0, null)
+        WallService.createComment(falsePostId, comment)
     }
 
     @Test
     fun reportShouldNotThrow() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
-        val postId = post.id
-        val comment = Comment(postId, 0, "some thread", 0, null)
-        WallService.createComment(postId, comment)
+        val comment = Comment(0, post.id, 0, "some thread", 0, null)
+        WallService.createComment(post.id, comment)
         val report = ReportComment(0, comment.id, 1)
         val returnReport = WallService.createReport(post.id, comment.id, report)
         assertEquals(
@@ -63,9 +56,8 @@ class WallServiceTest {
     @Test(expected = UnknownReasonException::class)
     fun reportShouldThrowUnknownReasonException() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
-        val postId = post.id
-        val comment = Comment(postId, 0, "some thread", 0, null)
-        WallService.createComment(postId, comment)
+        val comment = Comment(0, post.id,0, "some thread", 0, null)
+        WallService.createComment(post.id, comment)
         val report = ReportComment(0, comment.id, -1)
         WallService.createReport(post.id, comment.id, report)
     }
@@ -73,18 +65,18 @@ class WallServiceTest {
     @Test(expected = PostNotFoundException::class)
     fun reportShouldThrowPostNotFoundException() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
-        val anotherPostId = post.id + 1 // создаем неправильный id
-        val comment = Comment(anotherPostId, 0, "some thread", 0, null)
-        WallService.createComment(anotherPostId, comment)
+        val falsePostId = post.id + 1 // создаем неправильный id
+        val comment = Comment(0, falsePostId, 0, "some thread", 0, null)
+        WallService.createComment(falsePostId, comment)
     }
 
     @Test(expected = CommentNotFoundException::class)
     fun reportShouldThrowCommentNotFoundException() {
         val post = WallService.add(Post(0L, 0L, 0L, 0L, 0L, 0L))
-        val comment = Comment(post.id, 0, "some thread", 0, null)
+        val comment = Comment(0, post.id, 0, "some thread", 0, null)
         WallService.createComment(post.id, comment)
-        val commentId = comment.id + 1 // создаем неправильный id
-        val report = ReportComment(0, commentId, -1)
-        WallService.createReport(post.id, commentId, report)
+        val falseCommentId = comment.id + 1 // создаем неправильный id
+        val report = ReportComment(0, falseCommentId, 1)
+        WallService.createReport(post.id, falseCommentId, report)
     }
 }

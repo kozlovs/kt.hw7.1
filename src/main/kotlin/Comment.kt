@@ -3,6 +3,7 @@ import java.time.LocalDate
 
 data class Comment(
     val id: Long = 0,
+    val postId: Long,
     val fromId: Long,
     val thread: String,
     val replyToUser: Long?,
